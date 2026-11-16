@@ -57,15 +57,16 @@ L = 80
 d.text(P(L, 130), "F O O D - T R U C K  F A V O R I T E   ·   F I R S T   B R I C K - A N D - M O R T A R", font=sansm(17), fill=GOLD)
 # wordmark
 d.text(P(L, 168), "HAVEN EXPRESS", font=sans(84), fill=CREAM)
-# "LOUNGE" ember, tracked
-def tracked(text, x, y, fnt, fill, sp):
+# "LOUNGE" ember, tracked (device-space accumulation, logical input)
+def tracked(text, x_logical, y_logical, fnt, fill, sp_logical):
+    x, y = x_logical*S, y_logical*S
     for ch in text:
         d.text((x, y), ch, font=fnt, fill=fill)
-        x += d.textlength(ch, font=fnt) + sp*S
+        x += d.textlength(ch, font=fnt) + sp_logical*S
     return x
 xend = tracked("L O U N G E", L+2, 305, sans(40), EMBER, 6)
 # thin rule under wordmark
-d.line([P(L, 385), P(xend+30, 385)], fill=(231, 176, 79, 160), width=int(2*S))
+d.line([P(L, 385), (xend+30*S, 385*S)], fill=(231, 176, 79, 160), width=int(2*S))
 # address + hours lines
 d.text(P(L, 410), "1217 Leavenworth Street  ·  Old Market  ·  Omaha, NE 68102", font=sansm(24), fill=CREAM)
 d.text(P(L, 452), "Open Tue–Thu 3–9 PM  ·  Fri–Sat 3–11:30 PM  ·  (402) 210-4610", font=sansm(21), fill=MUTE)
@@ -74,12 +75,17 @@ d.text(P(L, 452), "Open Tue–Thu 3–9 PM  ·  Fri–Sat 3–11:30 PM  ·  (402
 cx, cy, rr = 1010, 480, 118
 d.ellipse([P(cx-rr, cy-rr), P(cx+rr, cy+rr)], outline=(255, 93, 36, 200), width=int(3*S))
 d.ellipse([P(cx-rr-26, cy-rr-26), P(cx+rr+26, cy+rr+26)], outline=(231, 176, 79, 90), width=int(2*S))
-# door glyph inside ring
-d.pieslice([P(cx-46, cy-70), P(cx+46, cy+62)], 180, 360, fill=None, outline=CREAM, width=int(4*S))
-d.rectangle([P(cx-46, cy-4), P(cx+46, cy+62)], fill=None, outline=CREAM, width=int(4*S))
-d.ellipse([P(cx+24, cy+22), P(cx+34, cy+32)], fill=CREAM)
-# "NOW OPEN" stamp inside ring top
-d.text(P(cx - d.textlength("N O W  O P E N", font=sans(17))/2, cy-rr-40), "N O W  O P E N", font=sans(17), fill=GOLD)
+# steaming-cup glyph inside ring (unambiguous: cup body + handle + steam)
+cup = [P(cx-30, cy-14), P(cx+30, cy-14), P(cx+22, cy+36), P(cx-22, cy+36)]
+d.polygon(cup, fill=None, outline=CREAM, width=int(4*S))
+d.arc([P(cx+26, cy-4), P(cx+54, cy+26)], start=-70, end=70, fill=CREAM, width=int(4*S))
+for i, sx in enumerate((cx-18, cx, cx+18)):
+    d.line([P(sx, cy-54), P(sx+5, cy-45), P(sx-5, cy-36), P(sx+4, cy-27), P(sx, cy-20)],
+           fill=(244, 234, 217, 210), width=int(3*S), joint="curve")
+d.line([P(cx-34, cy+44), P(cx+34, cy+44)], fill=(231, 176, 79, 160), width=int(3*S))
+# "NOW OPEN" stamp above ring, centered (textlength is device-px)
+_tl = d.textlength("N O W  O P E N", font=sans(17))
+d.text(P(cx - _tl/(2*S), cy-rr-42), "N O W  O P E N", font=sans(17), fill=GOLD)
 
 img = img.resize((W, H), Image.LANCZOS)
 img.save(OUT, "PNG", optimize=True)
