@@ -1,0 +1,8 @@
+{
+  "name": "haven-express",
+  "version": "1.0.0",
+  "description": "Haven Express Lounge — truck-to-storefront restaurant & lounge at 1217 Leavenworth St, Omaha NE (static site + node form relay)",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
